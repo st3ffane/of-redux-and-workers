@@ -1,21 +1,16 @@
 /**
  * Background process middleware for application/redux
  */
-import doneWorker from '../worker/index'; // link to web-worker or ipc
-import logger from '../logger';
-
-export default (store) => {
+export const middleware = (_worker) => (store) => {
   // init worker with store dispatch
-  logger.info('Creating worker middleware')
-  const worker = doneWorker(store.dispatch);
+  console.log('Init worker middleware')
+  const worker = initWorker(_worker, store.dispatch);
 
   return next => action => {
-    logger.silly('Action ' + action.type)
-    console.log('Action ' + action.type)
     let { type } = action;
-    if (type.startsWith('WORKER_')) {
+    console.log('Action: ', type)
+    if (type.startsWith('WORKER!')) {
       // send to process
-      console.log('Send command to worker' + type)
       // add meta to action
       /*action.meta = {
         token: store.getState().user.token
@@ -27,7 +22,6 @@ export default (store) => {
         })
         .catch((err) => {
           console.log('Error on process:', err)
-          logger.error(err);
           // what to do next?
           next(action); // go for next
         });
@@ -36,5 +30,20 @@ export default (store) => {
       return next(action); // go for next
     }
 
+  }
+}
+
+export function initWorker(worker, dispatch) {
+  // listen to worker message, dispatch result
+  // exemple with counter
+  worker.addEventListener('message', (result) => dispatch(result.data));
+  return {
+    process: function (action) {
+      return new Promise((resolve, reject) => {
+        console.log('Call to web-worker with init:' + action.type)
+        worker.postMessage(action);
+        resolve();
+      });
+    }
   }
 }

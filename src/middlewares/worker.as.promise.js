@@ -2,9 +2,9 @@ import { v4 } from 'uuid';
 const PENDINGS = {}; // pending promises
 
 // dispatch to worker and wait for a particular response to resolve
-export default ({ dispatch, getState }) => (next) => (action) => {
+export const middleware = ({ dispatch, getState }) => (next) => (action) => {
   // if action is a worker one with a wait data
-  if (action && action.type && action.type.startsWith('WORKER_')
+  if (action && action.type && action.type.startsWith('WORKER!')
     && action.resolvers) {
     let p = workerAsPromise(dispatch, action);
     // save with infos
