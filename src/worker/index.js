@@ -12,18 +12,19 @@ import { SUCCESS, ERROR, PREFIX } from '../middlewares/consts';
  * @param {function} cllbck callback to send result to main thread
  */
 function handleActions(event, cllbck, handlers) {
+  /* istanbul ignore if do nothing action */
   if (!event || !event.type) return; // do nothing action
   // should replay handler?
   const callback = (evt) => handleActions(evt, cllbck, handlers);
-
-  let { type, workerID } = event || {};
+  // console.log(`Worker call action with ${event.type}`)
+  let { type, workerID } = event;
   let resolvers = event.resolvers || {
-    resolveOn: (type || '').replace(PREFIX, '') + SUCCESS,
-    rejectOn: (type || '').replace(PREFIX, '') + ERROR,
+    resolveOn: type.replace(PREFIX, '') + SUCCESS,
+    rejectOn: type.replace(PREFIX, '') + ERROR,
   }
   if (handlers[type]) {
 
-    handlers[type](event, callback)
+    return handlers[type](event, callback)
       .then((data) => {
         let tmp = __createEventFromHandlerResponse(data, resolvers.resolveOn);
         tmp.workerID = workerID;
@@ -36,6 +37,7 @@ function handleActions(event, cllbck, handlers) {
 
   }
   // else send to main? or do nothing?
+  /* istanbul ignore else warning */
   if (!event.type.startsWith(PREFIX)) return cllbck(event);
   else console.warn(`Worker call action with ${PREFIX} (${event.type}), to prevent infinite loop, action is discarded`)
 }

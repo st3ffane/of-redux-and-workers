@@ -313,7 +313,7 @@ describe('Multi-concurrent process', () => {
   })
 })
 describe('All together...', () => {
-  it('Should init', () => {
+  it('Should init', (done) => {
     // config everything
     const store = {
       dispatch: sinon.fake(),

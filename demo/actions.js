@@ -13,5 +13,5 @@ export const CRASH_ERROR = "CRASH_ERROR";
 
 export const FORGET = "WORKER!FORGET";
 export const FORGET_TMP = "FORGET_TMP";
-export const FORGET_SUCCESS = "FORGET_SUCCESS";
-export const FORGET_ERROR = "FORGET_ERROR";
+export const FORGET_TMP_SUCCESS = "FORGET_SUCCESS";
+export const FORGET_TMP_ERROR = "FORGET_ERROR";

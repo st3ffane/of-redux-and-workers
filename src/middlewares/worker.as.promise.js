@@ -4,7 +4,7 @@ const PENDINGS = {}; // pending promises
 // dispatch to worker and wait for a particular response to resolve
 export const middleware = () => (next) => (action) => {
   // if action is a worker one with a wait data
-  if (action && action.type && action.type.startsWith('WORKER!')
+  if (action.type && action.type.startsWith('WORKER!')
     && action.resolvers) {
     let p = workerAsPromise(next, action);
     // save with infos
@@ -16,8 +16,11 @@ export const middleware = () => (next) => (action) => {
   else {
     // check if type must resolve or reject a pending promise
     if (PENDINGS[action.workerID]) {
+      // end dispatching action first.
+      next(action);
       PENDINGS[action.workerID].doResolve(action);
       delete PENDINGS[action.workerID];
+      return;
     }
   }
   return next(action);

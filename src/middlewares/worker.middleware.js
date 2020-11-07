@@ -12,10 +12,11 @@ export const middleware = (_worker) => (store) => {
       // send to process
       return worker.process(action)
         .then((result) => {
+          /* istanbul ignore if not implemented */
           if (result && result.type) next(result);// if something, pass the new action *not implemented yet
           else next(action);// if no response from worker, pass action to others
         })
-        .catch((err) => {
+        .catch(/* istanbul ignore next not implemented */(err) => {
           // what to do next?
           next(action); // go for next
         });
