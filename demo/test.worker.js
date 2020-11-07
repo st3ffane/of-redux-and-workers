@@ -1,4 +1,4 @@
-import initWorker from '../worker';
+import initWorker from '../src/worker';
 import * as ACTIONS from './actions';
 
 // handle messages from redux

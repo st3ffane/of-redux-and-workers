@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { SUCCESS, ERROR, PREFIX } from '../middlewares/consts';
 /**
  * @fileOverview Redux-like action processor
@@ -10,11 +11,10 @@ import { SUCCESS, ERROR, PREFIX } from '../middlewares/consts';
  * @param {Any} event redux-like action
  * @param {function} cllbck callback to send result to main thread
  */
-function handleActions(event, cllbck, store, handlers) {
+function handleActions(event, cllbck, handlers) {
   if (!event || !event.type) return; // do nothing action
-  console.log('Call to handle action ', event);
   // should replay handler?
-  const callback = (evt) => handleActions(evt, cllbck, store, handlers);
+  const callback = (evt) => handleActions(evt, cllbck, handlers);
 
   let { type, workerID } = event || {};
   let resolvers = event.resolvers || {
@@ -23,7 +23,7 @@ function handleActions(event, cllbck, store, handlers) {
   }
   if (handlers[type]) {
 
-    handlers[type](event, callback, store)
+    handlers[type](event, callback)
       .then((data) => {
         let tmp = __createEventFromHandlerResponse(data, resolvers.resolveOn);
         tmp.workerID = workerID;
@@ -37,7 +37,7 @@ function handleActions(event, cllbck, store, handlers) {
   }
   // else send to main? or do nothing?
   if (!event.type.startsWith(PREFIX)) return cllbck(event);
-  else console.warn('Worker call action with WORKER!, to prevent infinite loop, event is discarded')
+  else console.warn(`Worker call action with ${PREFIX} (${event.type}), to prevent infinite loop, action is discarded`)
 }
 
 function __createEventFromHandlerResponse(data, resolver) {
@@ -53,8 +53,7 @@ function __createEventFromHandlerResponse(data, resolver) {
   }
   return tmp;
 }
-const STORE = {};// for caching
-const getStore = () => STORE;
+
 export default function initWorker(handlers) {
-  self.addEventListener("message", (event) => handleActions(event.data, self.postMessage, getStore(), handlers));
+  self.addEventListener("message", (event) => handleActions(event.data, self.postMessage, handlers));
 }

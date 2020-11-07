@@ -3,13 +3,13 @@
 const path = require("path");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 require("@babel/register");
 // Webpack Configuration
 const config = {
   // Entry
-  entry: "./src/demo/index.js",
+  entry: "./demo/index.js",
   // Output
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -26,7 +26,7 @@ const config = {
         exclude: /node_modules/,
         use: ["babel-loader"],
       },
-      
+
       // CSS Files
       {
         test: /\.s?css$/,
@@ -51,12 +51,12 @@ const config = {
     new ManifestPlugin(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/demo/index.html',
+      template: './demo/index.html',
       filename: 'index.html',
       hash: true,
     }),
     new MiniCssExtractPlugin(),
-    
+
   ],
   optimization: {
     splitChunks: {

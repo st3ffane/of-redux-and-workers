@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 const PENDINGS = {}; // pending promises
 
 // dispatch to worker and wait for a particular response to resolve
-export const middleware = ({ dispatch, getState }) => (next) => (action) => {
+export const middleware = () => (next) => (action) => {
   // if action is a worker one with a wait data
   if (action && action.type && action.type.startsWith('WORKER!')
     && action.resolvers) {
@@ -40,7 +40,6 @@ function workerAsPromise(next, action) {
   let _resolve, _reject;
   let id = action.resolvers.workerID || v4();
   let pr = new Promise((resolve, reject) => {
-    let { type, payload, resolvers } = action;
     _resolve = resolve;
     _reject = reject;
 

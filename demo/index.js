@@ -6,7 +6,7 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 // workers utilities, in your code, will look like:
 // import { workerAsPromiseMiddleware, workerMiddleware } from 'of-redux-and-workers';
-import { workerAsPromiseMiddleware, workerMiddleware } from '../index';
+import { workerAsPromiseMiddleware, workerMiddleware } from '../src/index';
 import * as ACTIONS from './actions';
 
 // 1/ Create worker stuff -----------------------------------
