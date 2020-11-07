@@ -19,6 +19,9 @@ const app = (state = 'none', action) => {
     case ACTIONS.HELLO_SUCCESS: {
       return action.payload;
     }
+    case ACTIONS.FORGET_TMP: {
+      return action.payload;
+    }
     default: return state;
   }
 }
@@ -34,27 +37,82 @@ const store = createStore(
 );
 
 // 4/ Add some actions
-
+const sayHello = () => ({
+  type: ACTIONS.HELLO,
+  payload: 'Bonjour',
+  resolvers: {
+    resolveOn: ACTIONS.HELLO_SUCCESS,
+    rejectOn: ACTIONS.HELLO_ERROR
+  }
+})
+const saySomething = () => ({
+  type: ACTIONS.SOMETHING,
+  payload: 'Bonjour',
+  resolvers: {
+    resolveOn: [ACTIONS.SOMETHING_SUCCESS, ACTIONS.SOMETHING_SUCCESS2],
+    rejectOn: ACTIONS.SOMETHING_ERROR
+  }
+})
+const pleasCrash = () => ({
+  type: ACTIONS.CRASH,
+  payload: 'Bonjour',
+  resolvers: {
+    resolveOn: ACTIONS.CRASH_SUCCESS,
+    rejectOn: ACTIONS.CRASH_ERROR
+  }
+})
+const sendAndForget = () => ({
+  type: ACTIONS.FORGET,
+  payload: 'Bonjour', // no resolvers set here, dispatch will not return a promise!
+})
 // Demo related UI stuff
 window.addEventListener('load', () => {
   // get UI components in page
   let button = document.getElementById('button');
+  let button2 = document.getElementById('button2');
+  let button3 = document.getElementById('button3');
+  let button4 = document.getElementById('button4');
   let loader = document.getElementById('waiter');
   let result = document.getElementById('result');
 
   button.addEventListener('click', () => {
-    store.dispatch({
-      type: ACTIONS.HELLO,
-      payload: 'Bonjour',
-      resolvers: {
-        resolveOn: ACTIONS.HELLO_SUCCESS,
-        rejectOn: ACTIONS.HELLO_ERROR
-      }
-    }).then((res) => {
-      console.log('Finish', res)
-      result.innerText = res.payload;
-    }).catch((res) => {
-      console.error('fail', res)
-    })
+    loader.innerText = "wait while loading";
+    store.dispatch(sayHello())
+      .then((res) => {
+        console.log('Finish', res)
+        result.innerText = res.payload;
+      }).catch((res) => {
+        console.error('fail', res)
+      }).finally(() => {
+        loader.innerText = "";
+      })
+  })
+  button2.addEventListener('click', () => {
+    loader.innerText = "wait while loading";
+    store.dispatch(saySomething())
+      .then((res) => {
+        console.log('Finish', res)
+        result.innerText = res.payload;
+      }).catch((res) => {
+        console.error('fail', res)
+      }).finally(() => {
+        loader.innerText = "";
+      })
+  })
+  button3.addEventListener('click', () => {
+    loader.innerText = "wait while loading";
+    store.dispatch(pleasCrash())
+      .then((res) => {
+        console.log('Finish', res)
+        result.innerText = res.payload;
+      }).catch((res) => {
+        console.error('fail', res)
+      }).finally(() => {
+        loader.innerText = "";
+      })
+  })
+  button4.addEventListener('click', () => {
+    loader.innerText = "not waiting for dispatch...";
+    store.dispatch(sendAndForget())
   })
 });

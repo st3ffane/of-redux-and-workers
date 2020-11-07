@@ -6,7 +6,7 @@ export const middleware = ({ dispatch, getState }) => (next) => (action) => {
   // if action is a worker one with a wait data
   if (action && action.type && action.type.startsWith('WORKER!')
     && action.resolvers) {
-    let p = workerAsPromise(dispatch, action);
+    let p = workerAsPromise(next, action);
     // save with infos
     // what if 2 with same datas? should had an uuid?
     PENDINGS[p.id] = p;
@@ -36,7 +36,7 @@ let resolver = (resolve, reject, resolvers) => (action) => {
   }
 }
 
-function workerAsPromise(dispatch, action) {
+function workerAsPromise(next, action) {
   let _resolve, _reject;
   let id = action.resolvers.workerID || v4();
   let pr = new Promise((resolve, reject) => {
@@ -44,10 +44,9 @@ function workerAsPromise(dispatch, action) {
     _resolve = resolve;
     _reject = reject;
 
-    // dispatch action + payload
-    dispatch({
+    // next action + payload
+    next({
       ...action,
-      resolvers: undefined,
       workerID: id
     });
 
