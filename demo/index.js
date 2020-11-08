@@ -5,13 +5,12 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 // workers utilities, in your code, will look like:
 // import { workerAsPromiseMiddleware, workerMiddleware } from 'of-redux-and-workers';
-import { workerAsPromiseMiddleware, workerMiddleware } from '../src/index';
+import { workerAsPromiseMiddleware, workerMiddleware } from '../dist/index';
 import * as ACTIONS from './actions';
 
 // 1/ Create worker stuff -----------------------------------
 import Worker from 'worker-loader!./test.worker.js';
 const worker = new Worker();
-
 // 2/ Create Redux reducers to handle our datas -------------
 const app = (state = 'none', action) => {
   switch (action.type) {

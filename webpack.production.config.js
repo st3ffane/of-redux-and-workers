@@ -1,7 +1,7 @@
 // Imports: Dependencies
 // Note need to split in 2 conf files: one for demo, one for build
 const path = require("path");
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 require("@babel/register");
 // Webpack Configuration
 const config = {
@@ -11,6 +11,8 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
+    libraryTarget: 'umd',
+    globalObject: "this",
   },
   // Loaders
   module: {

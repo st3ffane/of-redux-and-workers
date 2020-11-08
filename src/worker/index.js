@@ -56,6 +56,6 @@ function __createEventFromHandlerResponse(data, resolver) {
   return tmp;
 }
 
-export default function initWorker(handlers) {
+export function initWorker(handlers) {
   self.addEventListener("message", (event) => handleActions(event.data, self.postMessage, handlers));
 }
