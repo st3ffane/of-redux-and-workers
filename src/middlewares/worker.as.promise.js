@@ -1,10 +1,11 @@
 import { v4 } from 'uuid';
+import { PREFIX } from './consts';
 const PENDINGS = {}; // pending promises
 
 // dispatch to worker and wait for a particular response to resolve
 export const middleware = () => (next) => (action) => {
   // if action is a worker one with a wait data
-  if (action.type && action.type.startsWith('WORKER!')
+  if (action.type && action.type.startsWith(PREFIX)
     && action.resolvers) {
     let p = workerAsPromise(next, action);
     // save with infos
