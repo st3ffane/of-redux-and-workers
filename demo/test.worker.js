@@ -8,9 +8,16 @@ const handlers = {
     return Promise.resolve('Hello!');
   },
   [ACTIONS.SOMETHING]: (action, dispatch) => {
+    // dispatch an action marked in resolvers.resolveOn,
+    // but this will **NOT** resolve the promesse.
+    dispatch({
+      type: ACTIONS.SOMETHING_SUCCESS,
+      payload: 'Did I resolved here?'
+    })
+    // this one will resolve the promise.
     return Promise.resolve({
       type: ACTIONS.SOMETHING_SUCCESS2,
-      payload: 'I like to go out!'
+      payload: 'No, I resolved here!'
     })
   },
   [ACTIONS.CRASH]: (action, dispatch) => {

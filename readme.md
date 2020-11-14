@@ -430,6 +430,10 @@ const process = (state = '', action) => {
 
 > If you resolve/reject an action without specifiying the type property (so, not a valid redux action), your worker handler will resolve/reject with the first item in the array. In our case, will resolve with 'ALL_IS_OK' and/or reject with 'ERROR_UNKNOWN'
 
+> **WHAT IF?** What if you dispatch an action type (with dispatch function) using a type marked in resolvers.resolveOn? The action will be sent to your redux store, but the promise will **not** resolve.
+
+> **WHAT IF?** What if a worker handler resolve with an action object which type is not listed in resolvers.resolveOn? Your action will be processed by the redux-store, but worker middleware will not be aware that the process is over, and will not resolve the promise. If you are stuck with a never ending promise, check that the action.type return by the worker handler is listed in the resolvers.resolveOn (simple string or array)
+
 ## Scripts
 
 - **Unit testing and code coverage**: results will be generated in _artifacts_ folder.

@@ -2,7 +2,7 @@ require('mocha');
 const sinon = require('sinon');
 const chai = require('chai');
 const expect = chai.expect;
-const initWorker = require('./index').default;
+const { initWorker } = require('./index');
 
 global.self = {
   addEventListener: function (type, cllbck) {

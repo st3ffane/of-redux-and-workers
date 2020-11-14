@@ -46,7 +46,7 @@ function __createEventFromHandlerResponse(data, resolver) {
   // user can have return a full response (ie type AND payload)
   // in that case, just had workerID
   let tmp = {};
-  if (data.type && data.payload) tmp = { ...data };
+  if (data.type /*&& data.payload*/) tmp = { ...data };
   else {
     // consider this is a payload only
     let resolve = resolver;

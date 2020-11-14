@@ -13,12 +13,17 @@ import Worker from 'worker-loader!./test.worker.js';
 const worker = new Worker();
 // 2/ Create Redux reducers to handle our datas -------------
 const app = (state = 'none', action) => {
+  console.log('Reducer:', action.type, action)
   switch (action.type) {
     case ACTIONS.HELLO_SUCCESS: {
       return 'Button 1: ' + action.payload;
     }
     case ACTIONS.SOMETHING_SUCCESS2: {
       return 'Button 2: ' + action.payload;
+    }
+    case ACTIONS.SOMETHING_SUCCESS: {
+      console.log('In the reducer:', action);
+      return state;
     }
     case ACTIONS.CRASH_ERROR: {
       return 'Button 3: ' + action.payload;
@@ -105,6 +110,7 @@ window.addEventListener('load', () => {
     loader.innerText = "wait while loading";
     store.dispatch(saySomething())
       .then((res) => {
+        console.log(res)
         result.innerText = store.getState().app;
       }).catch((res) => {
         console.error('fail', res)
