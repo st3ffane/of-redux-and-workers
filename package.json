@@ -1,8 +1,18 @@
 {
   "name": "of-redux-and-workers",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "web-workers in redux made easy",
-  "main": "dist/index.js",
+  "main": "index.js",
+  "browser": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/st3ffane/of-redux-and-workers.git"
+  },
+  "homepage": "https://github.com/st3ffane/of-redux-and-workers#readme",
+  "issue": "",
+  "bugs": {
+    "url": "https://github.com/st3ffane/of-redux-and-workers/issues"
+  },
   "scripts": {
     "report": "cross-env NODE_ENV=test nyc --reporter=html --report-dir=\"./artifacts/coverage\" --all  mocha \"src/**/*.test.js\" --timeout 3000  -R xunit --reporter-options output=artifacts/test/xunits.xml --require @babel/register --require babel-polyfill --bail --exit",
     "test": "mocha \"src/**/*.test.js\" --require @babel/register --require babel-polyfill --bail --exit",
@@ -15,7 +25,10 @@
     "redux",
     "middleware"
   ],
-  "author": "Done HUI",
+  "author": {
+    "name": "Stephane PONTEINS",
+    "email": "steph.ponteins@gmail.com"
+  },
   "license": "Beerware",
   "devDependencies": {
     "@babel/cli": "^7.12.1",
