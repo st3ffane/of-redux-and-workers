@@ -449,3 +449,8 @@ npm run start
 ```bash
 npm run build
 ```
+
+## Thanks
+
+- Thanks to Mathieu Leddet for feedback and bug tracking
+- And thanks to my company [Done HUI](https://www.meetings.monster/) for allowing me to create this open-source library from our work.
