@@ -3,7 +3,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+// const { CleanWebpackPlugin } = require('clean-webpack-plugin'); not in dev!
 const ManifestPlugin = require('webpack-manifest-plugin');
 require("@babel/register");
 // Webpack Configuration
@@ -49,7 +49,7 @@ const config = {
   // Plugins
   plugins: [
     new ManifestPlugin(),
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(), not in dev!
     new HtmlWebpackPlugin({
       template: './demo/index.html',
       filename: 'index.html',
