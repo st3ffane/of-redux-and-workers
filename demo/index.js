@@ -58,6 +58,12 @@ const sayHello = () => ({
     rejectOn: ACTIONS.HELLO_ERROR
   }
 })
+const sayHello2 = () => ({
+  type: ACTIONS.HELLO,
+  payload: 'Bonjour',
+  // empty resolvers will falback to generated ones
+  resolvers: {}
+})
 const saySomething = () => ({
   type: ACTIONS.SOMETHING,
   payload: 'Bonjour',
@@ -89,6 +95,7 @@ window.addEventListener('load', () => {
   let button2 = document.getElementById('button2');
   let button3 = document.getElementById('button3');
   let button4 = document.getElementById('button4');
+  let button5 = document.getElementById('button5');
   let loader = document.getElementById('waiter');
   let result = document.getElementById('result');
 
@@ -134,5 +141,19 @@ window.addEventListener('load', () => {
     setTimeout(() => {
       result.innerText = store.getState().app;
     }, 100)
+  })
+  button5.addEventListener('click', () => {
+    loader.innerText = "wait while loading";
+    // dispatch the action to the worker middlewares
+    store.dispatch(sayHello2())
+      .then((res) => {
+        // res is the result action of the worker call, but
+        // once dispatch resolved, datas are already in your store!
+        result.innerText = store.getState().app;
+      }).catch((res) => {
+        console.error('fail', res)
+      }).finally(() => {
+        loader.innerText = "";
+      })
   })
 });

@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { PREFIX } from './consts';
+import { PREFIX, SUCCESS, ERROR } from './consts';
 const PENDINGS = {}; // pending promises
 
 // dispatch to worker and wait for a particular response to resolve
@@ -30,10 +30,12 @@ export const middleware = () => (next) => (action) => {
 let resolver = (resolve, reject, resolvers) => (action) => {
   let { type } = action;
   let { resolveOn, rejectOn } = resolvers;
+  /* istanbul ignore else always set */
   if (resolveOn) {
     if (typeof resolveOn === 'string' && resolveOn === type) return resolve(action);
     else if (Array.isArray(resolveOn) && resolveOn.find((r) => r === type)) return resolve(action);
   }
+  /* istanbul ignore else always set */
   if (rejectOn) {
     if (typeof rejectOn === 'string' && rejectOn === type) return reject(action);
     else if (Array.isArray(rejectOn) && rejectOn.find((r) => r === type)) return reject(action);
@@ -43,16 +45,22 @@ let resolver = (resolve, reject, resolvers) => (action) => {
 function workerAsPromise(next, action) {
   let _resolve, _reject;
   let id = action.resolvers.workerID || v4();
+  let resolveOn = action.resolvers.resolveOn || [action.type.replace(PREFIX, '') + SUCCESS,];
+  let rejectOn = action.resolvers.rejectOn || [action.type.replace(PREFIX, '') + ERROR];
+
   let pr = new Promise((resolve, reject) => {
     _resolve = resolve;
     _reject = reject;
 
     // next action + payload
+    // resolveOn && rejectOn, if not set, add default one
     next({
       ...action,
-      workerID: id
+      workerID: id,
+      resolvers: { resolveOn, rejectOn }
     });
 
   });
-  return { doResolve: resolver(_resolve, _reject, action.resolvers), promise: pr, id }
+
+  return { doResolve: resolver(_resolve, _reject, { resolveOn, rejectOn }), promise: pr, id }
 }

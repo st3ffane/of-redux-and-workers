@@ -63,6 +63,39 @@ describe('Worker as promise', () => {
     expect(next.calledOnceWith({ type: 'WORKER!DOSTUFF' }));
 
   })
+  it('should start and resolve a promise worker action with default actions', (done) => {
+    const store = {
+      dispatch: sinon.fake(),
+    }
+    const next = sinon.fake();
+    let mddwr = workerAsPromise(store)(next);
+
+    // dispatch a simple call
+    let p = mddwr({
+      type: 'WORKER!DOSTUFF',
+      resolvers: {
+        workerID: 1, // force ID
+
+      }
+    });
+
+    setTimeout(() => {
+      // dispatch a resolve
+      mddwr({
+        type: 'DOSTUFF_SUCCESS',
+        workerID: 1
+      });
+      p.then((result) => {
+        expect(result.type).to.equal('DOSTUFF_SUCCESS');
+        expect(next.callCount).to.equal(2)
+        done();
+      })
+    }, 100);
+    // promise do not resolved yet
+    expect(next.callCount).to.equal(1);
+    expect(next.calledOnceWith({ type: 'WORKER!DOSTUFF' }));
+
+  })
   it('should start and resolve a promise worker action for one of possible', (done) => {
     const store = {
       dispatch: sinon.fake(),
@@ -341,6 +374,41 @@ describe('All together...', () => {
       });
       p.then((result) => {
         expect(result.type).to.equal('STUFF_DONE');
+        expect(next.callCount).to.equal(2)
+        done();
+      })
+    }, 100);
+    // promise do not resolved yet
+    expect(next.callCount).to.equal(1); // call dispatch directly
+
+  })
+  it('Should init with default', (done) => {
+    // config everything
+    const store = {
+      dispatch: sinon.fake(),
+    }
+
+    const finalNext = sinon.fake(); // for not running in circle
+    const mockWorker = workermddwr(MOCK_WORKER)(store)(finalNext);
+    const next = sinon.fake((action) => mockWorker(action)); // next call worker middleware
+    let mddwr = workerAsPromise(store)(next);
+    // dispatch a simple call
+    let p = mddwr({
+      type: 'WORKER!DOSTUFF',
+      resolvers: {
+        workerID: 1, // force ID
+      }
+    });
+
+    setTimeout(() => {
+      // dispatch a resolve
+      // as from worker
+      mddwr({
+        type: 'DOSTUFF_SUCCESS',
+        workerID: 1
+      });
+      p.then((result) => {
+        expect(result.type).to.equal('DOSTUFF_SUCCESS');
         expect(next.callCount).to.equal(2)
         done();
       })

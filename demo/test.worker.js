@@ -7,6 +7,10 @@ const handlers = {
     let { payload } = action;
     return Promise.resolve('Hello!');
   },
+  [ACTIONS.HELLO2]: (action, dispatch) => {
+    let { payload } = action;
+    return Promise.resolve('Hello - 2!');
+  },
   [ACTIONS.SOMETHING]: (action, dispatch) => {
     // dispatch an action marked in resolvers.resolveOn,
     // but this will **NOT** resolve the promesse.
