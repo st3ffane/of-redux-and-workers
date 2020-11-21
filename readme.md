@@ -298,7 +298,13 @@ You will sometimes need to send back to your store partial results or progress i
     });
   };
 ```
-
+The resulting action of workerMiddleware have the form:
+```ts
+{
+  type: [String] the action type
+  payload: [Object] here live the dragons and your datas returned by the handler promise
+}
+```
 ## workerAsPromiseMiddleware
 
 The idea behind this middleware is to mimic redux-thunk behaviour: dispatch an action to the web worker and wait until it finished to continue processing.
