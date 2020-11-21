@@ -4,7 +4,10 @@ const chai = require('chai');
 const expect = chai.expect;
 const workermddwr = require('./worker.middleware').middleware;
 const workerAsPromise = require('./worker.as.promise').middleware;
+const { initWorker } = require('../index');
+const { PREFIX, SUCCESS, ERROR } = require('./consts');
 
+const { createStore, applyMiddleware, combineReducers } = require('redux');
 const MOCK_WORKER = {
   addEventListener: (t, cllbck) => {
 
@@ -416,5 +419,74 @@ describe('All together...', () => {
     // promise do not resolved yet
     expect(next.callCount).to.equal(1); // call dispatch directly
 
+  })
+});
+describe('Integration test: all together', () => {
+  it('Should init with default', (done) => {
+    // create a redux store with middlewares and worker like actions
+    // actions
+    const ACTIONS = {
+      TEST: PREFIX + 'TEST',
+      TEST_OK: 'TEST' + SUCCESS,
+      TEST_ERROR: 'TEST' + ERROR
+    }
+    const app = (state = 'none', action) => {
+      console.log('Reducer:', action.type, action)
+      switch (action.type) {
+        case ACTIONS.TEST_OK: {
+          return 'Button 1: ' + action.payload;
+        }
+        default: return state;
+      }
+    }
+    const reducers = combineReducers({
+      'app': app
+    });
+
+    const worker = {
+      postMessage: function (dt) {
+        // send back a response?
+        // call worker handler
+        global.self.__handler({ data: dt })
+      },
+      addEventListener: function (type, handler) {
+        this.handler = handler;
+      }
+    };
+    // create a worker like: mock datas
+    global.self = {};
+    global.self.postMessage = (action) => {
+      worker.handler({ data: action })
+    }
+    global.self.addEventListener = (t, handler) => {
+      global.self.__handler = handler;
+    }
+    initWorker({
+      [ACTIONS.TEST]: (action, dispatch) => {
+        console.log('Action', action);
+        return Promise.resolve('OK')
+      }
+    })
+    const store = createStore(
+      reducers,
+      applyMiddleware(
+        workerAsPromise, // worker as promise must be set **BEFORE** workerMiddleware!
+        workermddwr(worker)),
+    );
+    // spy on dispatch
+    sinon.spy(store, 'dispatch');
+
+    // all is ready, dispatch an action
+    store.dispatch({
+      type: ACTIONS.TEST,
+      payload: 'datas',
+      resolvers: {}
+    }).then((res) => {
+      expect(res.type).to.equal(ACTIONS.TEST_OK);
+      expect(res.payload).to.equal('OK')
+      expect(store.dispatch.callCount).to.equal(1); // in test, response is sent before dispatching question...
+      expect(store.dispatch.calledWith({ type: ACTIONS.TEST_OK, payload: 'OK' }))
+      done();
+    })
   })
 })

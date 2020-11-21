@@ -16,17 +16,16 @@ const app = (state = 'none', action) => {
   console.log('Reducer:', action.type, action)
   switch (action.type) {
     case ACTIONS.HELLO_SUCCESS: {
-      return 'Button 1: ' + action.payload;
+      return action.payload;
     }
     case ACTIONS.SOMETHING_SUCCESS2: {
-      return 'Button 2: ' + action.payload;
+      return action.payload;
     }
     case ACTIONS.SOMETHING_SUCCESS: {
-      console.log('In the reducer:', action);
       return state;
     }
     case ACTIONS.CRASH_ERROR: {
-      return 'Button 3: ' + action.payload;
+      return action.payload;
     }
     // When creating the action, we do not set resolvers
     // for a send and forget call, the lib will auto create
@@ -68,7 +67,7 @@ const saySomething = () => ({
   type: ACTIONS.SOMETHING,
   payload: 'Bonjour',
   resolvers: {
-    resolveOn: [ACTIONS.SOMETHING_SUCCESS, ACTIONS.SOMETHING_SUCCESS2],
+    resolveOn: ACTIONS.SOMETHING_SUCCESS2,
     rejectOn: ACTIONS.SOMETHING_ERROR
   }
 })
@@ -95,7 +94,7 @@ window.addEventListener('load', () => {
   let button2 = document.getElementById('button2');
   let button3 = document.getElementById('button3');
   let button4 = document.getElementById('button4');
-  let button5 = document.getElementById('button5');
+  // let button5 = document.getElementById('button5');
   let loader = document.getElementById('waiter');
   let result = document.getElementById('result');
 
@@ -118,7 +117,7 @@ window.addEventListener('load', () => {
     store.dispatch(saySomething())
       .then((res) => {
         console.log(res)
-        result.innerText = store.getState().app;
+        document.getElementById('result2').innerText = store.getState().app;
       }).catch((res) => {
         console.error('fail', res)
       }).finally(() => {
@@ -129,31 +128,31 @@ window.addEventListener('load', () => {
     loader.innerText = "wait while loading";
     store.dispatch(pleasCrash())
       .catch((res) => {
-        result.innerText = store.getState().app;
+        document.getElementById('result3').innerText = store.getState().app;
       }).finally(() => {
         loader.innerText = "";
       })
   })
   button4.addEventListener('click', () => {
-    loader.innerText = "not waiting for dispatch...";
+    document.getElementById('loader4').innerText = "not waiting for dispatch...";
     store.dispatch(sendAndForget());
     // wait 100ms and display what is in the store
     setTimeout(() => {
-      result.innerText = store.getState().app;
+      document.getElementById('result4').innerText = store.getState().app;
     }, 100)
   })
-  button5.addEventListener('click', () => {
-    loader.innerText = "wait while loading";
-    // dispatch the action to the worker middlewares
-    store.dispatch(sayHello2())
-      .then((res) => {
-        // res is the result action of the worker call, but
-        // once dispatch resolved, datas are already in your store!
-        result.innerText = store.getState().app;
-      }).catch((res) => {
-        console.error('fail', res)
-      }).finally(() => {
-        loader.innerText = "";
-      })
-  })
+  // button5.addEventListener('click', () => {
+  //   loader.innerText = "wait while loading";
+  //   // dispatch the action to the worker middlewares
+  //   store.dispatch(sayHello2())
+  //     .then((res) => {
+  //       // res is the result action of the worker call, but
+  //       // once dispatch resolved, datas are already in your store!
+  //       document.getElementById('result5').innerText = store.getState().app;
+  //     }).catch((res) => {
+  //       console.error('fail', res)
+  //     }).finally(() => {
+  //       loader.innerText = "";
+  //     })
+  // })
 });

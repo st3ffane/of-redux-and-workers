@@ -32,7 +32,7 @@ npm install of-redux-and-workers
 
 > You can find a simple application using webpack, worker-loader, redux and web workers in [demo folder](https://github.com/st3ffane/of-redux-and-workers/tree/main/demo)
 
-> If you want to see this lib in a react app, you can check [react demo git](https://github.com/st3ffane/of-redux-and-workers/tree/main/demo) and take a look at [my super tutorial not yet written](https://github.com/st3ffane/of-redux-and-workers/tree/main/demo).
+> If you want to see this lib in a react app, you can check [react demo git](https://github.com/st3ffane/oraw-demo).
 
 First of all, I will assume your are familiar with [webpack](https://webpack.js.org/) and its basic configuration. Second, I prefer (but that's not mandatory) load workers with [worker-loader](https://github.com/webpack-contrib/worker-loader) plugin, so damn easy, but it's up to you.
 If you don't know how to set up your configuration, you can check the demo [webpack.config.js](https://github.com/st3ffane/of-redux-and-workers/blob/main/webpack.config.js) to see how I do it (that's just an exemple, not production ready).
@@ -107,11 +107,11 @@ const store = createStore(
 
 // 4/ Add some actions
 const sayHello = () => ({
-  type: ACTIONS.HELLO,
+  type: TYPES.HELLO,
   payload: "Bonjour",
   resolvers: {
-    resolveOn: ACTIONS.HELLO_SUCCESS,
-    rejectOn: ACTIONS.HELLO_ERROR,
+    resolveOn: TYPES.HELLO_SUCCESS,
+    rejectOn: TYPES.HELLO_ERROR,
   },
 });
 

@@ -1,15 +1,212 @@
 <html>
 
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism.css" rel="stylesheet" />
+  <style>
+    html,
+    body {
+      width: 100%;
+    }
+
+    .demo {
+      display: flex;
+      flex: 1 1;
+      flex-direction: column;
+    }
+
+    .demo .demo-item {
+      display: flex;
+      flex: 1 1;
+    }
+
+    .demo .demo-item>div {
+      flex: 1 1;
+    }
+
+    .demo .demo-item>.code {
+      font-size: 12px;
+    }
+  </style>
+</head>
+
 <body>
-  <div>
-    <button id="button">Click me!</button>
-    <button id="button2">Click me 2!</button>
-    <button id="button5">Click me 5!</button>
-    <button id="button3">Click me error!</button>
-    <button id="button4">Click me - no promise!</button>
-    <div id="waiter"></div>
-    <div id="result"></div>
+  <div class="demo">
+    <div class="demo-item">
+      <div class="action">
+        <p>A basic exemple: click on button will send a action to the web-worker and worker send back 'hello'</p>
+        <button id="button">Say hello</button>
+        <div id="result"></div>
+      </div>
+      <div class="code">
+        <pre><code class="language-ts">
+            // action creator
+            const sayHello = () => ({
+              type: ACTIONS.HELLO,
+              payload: 'Bonjour',
+              resolvers: {
+                resolveOn: ACTIONS.HELLO_SUCCESS,
+                rejectOn: ACTIONS.HELLO_ERROR
+              }
+            });
+            ...
+            // worker handler
+            const handlers = {
+              [TYPES.HELLO]: (action, dispatch) => {
+                return Promise.resolve("Hello!");
+              },
+            };
+            ...
+            // UI
+            button.addEventListener("click", () => {
+              loader.innerText = "wait while loading";
+              // dispatch the action to the worker middlewares
+              store
+                .dispatch(sayHello())
+                .then((res) => {
+                  result.innerText = store.getState().app;
+                })
+                .catch((res) => {
+                  console.error("fail", res);
+                })
+                .finally(() => {
+                  loader.innerText = "";
+                });
+            });
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="demo-item">
+      <div class="action">
+        <p>A basic exemple 2: click on button will send a action to the web-worker and worker will reject promise.</p>
+        <button id="button3">Rejecting promise</button>
+        <div id="result3"></div>
+      </div>
+      <div class="code">
+        <pre><code class="language-ts">
+          // action creator
+          const pleasCrash = () => ({
+            type: ACTIONS.CRASH,
+            payload: 'Bonjour',
+            resolvers: {
+              resolveOn: ACTIONS.CRASH_SUCCESS,
+              rejectOn: ACTIONS.CRASH_ERROR
+            }
+          })
+          ...
+          // worker handler
+          [ACTIONS.CRASH]: (action, dispatch) => {
+              return Promise.reject('nope')
+            },
+          ...
+          // UI
+          button3.addEventListener('click', () => {
+              loader.innerText = "wait while loading";
+              store.dispatch(pleasCrash())
+                .catch((res) => {
+                  result.innerText = store.getState().app;
+                }).finally(() => {
+                  loader.innerText = "";
+                })
+            })
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="demo-item">
+      <div class="action">
+        <p>An exemple on dispatching actions while processing in worker. Check the logs to see first action displaying.
+        </p>
+        <button id="button2">call to dispatch</button>
+        <div id="result2"></div>
+      </div>
+      <div class="code">
+        <pre><code class="language-ts">
+          // action creator
+          const saySomething = () => ({
+            type: ACTIONS.SOMETHING,
+            payload: 'Bonjour',
+            resolvers: {
+              resolveOn: ACTIONS.SOMETHING_SUCCESS2,
+              rejectOn: ACTIONS.SOMETHING_ERROR
+            }
+          })
+          ...
+          // worker handler
+          [ACTIONS.SOMETHING]: (action, dispatch) => {
+            // dispatch an action marked in resolvers.resolveOn,
+            // but this will **NOT** resolve the promesse.
+            dispatch({
+              type: ACTIONS.SOMETHING_SUCCESS,
+              payload: 'Did I resolved here?'
+            })
+            // this one will resolve the promise.
+            return Promise.resolve({
+              type: ACTIONS.SOMETHING_SUCCESS2,
+              payload: 'No, I resolved here!'
+            })
+          },
+          ...
+          // UI
+          store.dispatch(saySomething())
+            .then((res) => {
+              console.log(res)
+              document.getElementById('result2').innerText = store.getState().app;
+            }).catch((res) => {
+              console.error('fail', res)
+            }).finally(() => {
+              loader.innerText = "";
+      })
+            })
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="demo-item">
+      <div class="action">
+        <p>A send-and-forget dispatch to worker. Result will be processed by the redux store, but redux's dispatch do
+          not send back a promise.
+        </p>
+        <button id="button4">Send and forget</button>
+        <div id="loader4"></div>
+        <div id="result4"></div>
+      </div>
+      <div class="code">
+        <pre><code class="language-ts">
+          // action creator
+          const sendAndForget = () => ({
+            type: ACTIONS.FORGET,
+            payload: 'Bonjour', // no resolvers set here, dispatch will not return a promise!
+          })
+          ...
+          // worker handler
+          [ACTIONS.FORGET]: (action, dispatch) => {
+            return new Promise((resolve, reject) => {
+              // we can send data directly to redux with dispatch
+              // must be a valid redux message (ie: got a type)
+              dispatch({
+                type: ACTIONS.FORGET_TMP,
+                payload: 'hehehe'
+              });
+
+              resolve('end process')
+            })
+          ...
+          // UI
+          document.getElementById('loader4').innerText = "not waiting for dispatch...";
+          store.dispatch(sendAndForget());
+          // wait 100ms and display what is in the store
+          setTimeout(() => {
+            document.getElementById('result4').innerText = store.getState().app;
+          }, 100)
+        </code></pre>
+      </div>
+    </div>
+  </div>
+  <div id="waiter"></div>
   </div>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
 </html>

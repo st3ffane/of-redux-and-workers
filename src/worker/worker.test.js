@@ -4,17 +4,19 @@ const chai = require('chai');
 const expect = chai.expect;
 const { initWorker } = require('./index');
 
-global.self = {
-  addEventListener: function (type, cllbck) {
-    this.cllbck = cllbck;
-  },
-  testMessage: function (data) {
-    this.cllbck(data);
-  },
-  postMessage: sinon.fake(),
-}
-describe('Testing worker init', () => {
 
+describe('Testing worker init', () => {
+  beforeEach(() => {
+    global.self = {
+      addEventListener: function (type, cllbck) {
+        this.cllbck = cllbck;
+      },
+      testMessage: function (data) {
+        this.cllbck(data);
+      },
+      postMessage: sinon.fake(),
+    }
+  })
   it('Should create a worker', () => {
     let handlers = {};
     initWorker(handlers);
